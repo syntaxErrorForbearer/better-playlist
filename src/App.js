@@ -94,6 +94,8 @@ class App extends Component {
     */
     this.setState({ serverData: fakeServerData });
   }
+
+
   render() {
     // let name = 'Ram';
     // let headerStyle = {color: 'lightgreen', 'font-size': '50px'};
@@ -101,13 +103,11 @@ class App extends Component {
       <div className="App">
         {this.state.serverData.user ?
         <div>
-          {this.state.serverData.user &&
           <h1 style={{...defaultStyle, 'font-size': '54px'}}>
             {this.state.serverData.user.name}'s Playlist
           </h1>}
-            console.log('my state: ' this.state);
-            <PlaylistCounter playlist={this.state.serverData.user.playlists}/>
-            <HoursCounter playlist={this.state.serverData.user.playlists}/>
+            <PlaylistCounter playlists={this.state.serverData.user.playlists}/>
+            <HoursCounter playlists={this.state.serverData.user.playlists}/>
           <Filter />
           <Playlist />
           <Playlist />
