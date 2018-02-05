@@ -13,21 +13,21 @@ let fakeServerData = {
         name: 'My Favorites',
         songs: [
           {name:'Beat it', duration: 1234},
-          {name: 'Hello', duration: 1234}
+          {name: 'Hello', duration: 12.96}
         ]
       },
       {
         name: 'My Favorites',
         songs: [
-          {name:'Beat it', duration: 1234},
-          {name: 'Hello', duration: 1234}
+          {name:'Beat it1', duration: 1234},
+          {name: 'Hello1', duration: 1234}
         ]
       },
       {
         name: 'My Favorites',
         songs: [
-          {name:'Beat it', duration: 1234},
-          {name: 'Hello', duration: 1234}
+          {name:'Beat it2', duration: 1.234},
+          {name: 'Hello2', duration: 1234}
         ]
       }
     ]
@@ -49,10 +49,15 @@ class HoursCounter extends Component{
     let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
       return songs.concat(eachPlaylist.songs)
     },[])
-    // let totalDuration =
+    let totalDuration = allSongs.reduce((sum, eachSong) => {
+      return sum + eachSong.duration
+    }, 0)
     return(
       <div style={{...defaultStyle, width: "40%", display: 'inline-block'}}>
-        <h2>{allSongs.length} hours</h2>
+        <h2>
+          {parseFloat(totalDuration/60)
+              .toFixed(2)} hours
+        </h2>
       </div>
     );
   }
