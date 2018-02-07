@@ -97,34 +97,13 @@ class App extends Component {
     this.state = {serverData: {}};
   }
   componentDidMount() {
-    /*
     setTimeout( () => {
       this.setState({ serverData: fakeServerData });
     }, 1000);
-    */
-    this.setState({ serverData: fakeServerData });
   }
 
 
   render() {
-    //let playlistElements =[];
-/*
-    // forEach() example *slightly better than for loop
-    if (this.state.serverData.user) {
-      this.state.serverData.user.playlist.forEach(playlist =>
-        playlistElements.push(<Playlist playlist={playlist} />)
-      )
-    }
-    // for loop *works but it ain't pretty
-      for (let i = 0; i < this.state.serverData.user.playlists.length; i++) {
-        let playlist = this.state.serverData.user.playlists[i]
-        playlistElements.push(<Playlist playlist={playlist} />)
-      }
-    }
-    {playlistElements} <- elements array
-
-*/
-
     return (
       <div className="App">
         {this.state.serverData.user ?
@@ -135,7 +114,6 @@ class App extends Component {
             <PlaylistCounter playlists={this.state.serverData.user.playlists}/>
             <HoursCounter playlists={this.state.serverData.user.playlists}/>
           <Filter />
-          {/* Map example **best practice**/}
           {this.state.serverData.user.playlists.map(playlist =>
             <Playlist playlist={playlist}/>
           )}
