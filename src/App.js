@@ -17,14 +17,14 @@ let fakeServerData = {
         ]
       },
       {
-        name: 'My Favorites1',
+        name: 'The right Stuff',
         songs: [
           {name:'Beat it1', duration: 1234},
           {name: 'Hello1', duration: 1234}
         ]
       },
       {
-        name: 'My Favorites2',
+        name: 'the good stuff',
         songs: [
           {name:'Beat it2', duration: 1.234},
           {name: 'Hello2', duration: 1234}
@@ -68,7 +68,7 @@ class Filter extends Component{
     return(
       <div style={{defaultStyle}}>
         <img/>
-        <input type="text"/>
+        <input type="text" onKeyUp={(e) => this.props.onTextChange(e.target.value) }/>
       </div>
     )
   }
@@ -83,7 +83,7 @@ class Playlist extends Component{
         <h3>{playlist.name}</h3>
         <ul>
           {this.props.playlist.songs.map(song =>
-            <li>{song.name}</li>
+            <li key={song.name}>{song.name}</li>
           )}
         </ul>
       </div>
@@ -94,29 +94,37 @@ class Playlist extends Component{
 class App extends Component {
   constructor() {
     super();
-    this.state = {serverData: {}};
+    this.state = {
+      serverData: {},
+      filterString: ''
+    }
   }
   componentDidMount() {
     setTimeout( () => {
-      this.setState({ serverData: fakeServerData });
+      this.setState({serverData: fakeServerData });
     }, 1000);
   }
-
-
   render() {
+
     return (
       <div className="App">
         {this.state.serverData.user ?
         <div>
-          <h1 style={{...defaultStyle, 'font-size': '54px'}}>
+          <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
             {this.state.serverData.user.name}'s Playlist
           </h1>
             <PlaylistCounter playlists={this.state.serverData.user.playlists}/>
             <HoursCounter playlists={this.state.serverData.user.playlists}/>
-          <Filter />
-          {this.state.serverData.user.playlists.map(playlist =>
-            <Playlist playlist={playlist}/>
-          )}
+          <Filter onTextChange={text => {
+            this.setState({filterString: text})
+          }}/>
+          {this.state.serverData.user.playlists.filter(playlist =>
+            playlist.name.toLowerCase().includes(
+              this.state.filterString.toLowerCase())
+          ).map(playlist => {
+            let key = Math.random().toString()
+            return <Playlist key={key} playlist={playlist}/>
+          })}
         </div> : <h1 style={defaultStyle}>'Loading...'</h1>
         }
       </div>
