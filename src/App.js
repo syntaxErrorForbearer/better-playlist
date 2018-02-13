@@ -10,7 +10,7 @@ let fakeServerData = {
     name: 'Rambo',
     playlists: [
       {
-        name: 'My Favorites',
+        name: 'Favorites',
         songs: [
           {name:'Beat it', duration: 1234},
           {name: 'Hello', duration: 12.96}
@@ -113,8 +113,14 @@ class App extends Component {
           <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
             {this.state.serverData.user.name}'s Playlist
           </h1>
-            <PlaylistCounter playlists={this.state.serverData.user.playlists}/>
-            <HoursCounter playlists={this.state.serverData.user.playlists}/>
+            <PlaylistCounter playlists={this.state.serverData.user.playlists
+              .filter(playlist =>
+                playlist.name.toLowerCase().includes(
+                  this.state.filterString.toLowerCase()))}/>
+            <HoursCounter playlists={this.state.serverData.user.playlists
+              .filter(playlist =>
+                playlist.name.toLowerCase().includes(
+                  this.state.filterString.toLowerCase()))}/>
           <Filter onTextChange={text => {
             this.setState({filterString: text})
           }}/>
