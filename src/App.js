@@ -105,15 +105,16 @@ class App extends Component {
   componentDidMount() {
     let parsed = queryString.parse(window.location.search)
     let accessToken = parsed.access_token
-
-     fetch('https://api.spotify.com/v1/me', {
-       headers: {'Authorization': 'Bearer ' + accessToken}
-     }).then(response => response.json())
-     .then(data => this.setState({
-       user: {
-         name: data.display_name
-       }
-     }))
+    if (!accessToken)
+      return;
+   fetch('https://api.spotify.com/v1/me', {
+     headers: {'Authorization': 'Bearer ' + accessToken}
+   }).then(response => response.json())
+   .then(data => this.setState({
+     user: {
+       name: data.display_name
+     }
+   }))
 
     fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {'Authorization': 'Bearer ' + accessToken}
@@ -144,7 +145,7 @@ class App extends Component {
         {this.state.user ?
           <div>
             <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
-              {this.state.user.name}'s Playlist
+              {this.state.user.name}'s Playlist-heroku-updating?
             </h1>
               <PlaylistCounter playlists={playlistToRender} />
               <HoursCounter playlists={playlistToRender} />
@@ -154,8 +155,14 @@ class App extends Component {
               {playlistToRender.map(playlist =>
                 <Playlist playlist={playlist} />
               )}
-          </div> : <button onClick={() => window.location = 'http://localhost:8888/login'}
+
+          </div> : <button onClick={() => {
+            window.location = window.location.href.includes('localhost')
+              ? 'http://localhost:8888/login'
+              : 'https://better-playlists-4-you.herokuapp.com/login' }
+            }
             style={{padding: '20px', 'fontSize': '50px', 'marginTop': '20px'}}>Sign in to Spotify</button>
+        // {/*</div> : <button onClick={() => window.location = 'http://localhost:8888/login'}*/}
           //{{/*<h1 style={defaultStyle}>'Loading...'</h1>*/}}
         }
       </div>
