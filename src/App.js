@@ -145,7 +145,7 @@ class App extends Component {
         {this.state.user ?
           <div>
             <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
-              {this.state.user.name}'s Playlist
+              {this.state.user.name}'s Playlist HERO
             </h1>
               <PlaylistCounter playlists={playlistToRender} />
               <HoursCounter playlists={playlistToRender} />
