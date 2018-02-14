@@ -145,7 +145,7 @@ class App extends Component {
         {this.state.user ?
           <div>
             <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
-              {this.state.user.name}'s Playlist-heroku-updating?
+              {this.state.user.name}'s Playlist
             </h1>
               <PlaylistCounter playlists={playlistToRender} />
               <HoursCounter playlists={playlistToRender} />
@@ -159,7 +159,7 @@ class App extends Component {
           </div> : <button onClick={() => {
             window.location = window.location.href.includes('localhost')
               ? 'http://localhost:8888/login'
-              : 'https://better-playlists-4-you.herokuapp.com/login' }
+              : 'https://better-playlists-backend-4-you.herokuapp.com/login' }
             }
             style={{padding: '20px', 'fontSize': '50px', 'marginTop': '20px'}}>Sign in to Spotify</button>
         // {/*</div> : <button onClick={() => window.location = 'http://localhost:8888/login'}*/}
