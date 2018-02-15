@@ -43,8 +43,9 @@ class HoursCounter extends Component{
     }, 0)
     return(
       <div style={{...defaultStyle, width: "40%", display: 'inline-block'}}>
+       {/*<h2>{Math.round(totalDuration)} hours</h2>*/}
         <h2>
-          {parseFloat(totalDuration/60)
+          {parseFloat(totalDuration / (1000 * 60 * 60))
               .toFixed(2)} hours
         </h2>
       </div>
@@ -113,10 +114,8 @@ class App extends Component {
         let responsePromise = fetch(playlist.tracks.href, {
           headers: {'Authorization': 'Bearer ' + accessToken}
         })
-        console.log('responsePromise: ', responsePromise)
         let trackDataPromise = responsePromise
           .then(response => response.json())
-        console.log('trackDataPromise: ', trackDataPromise)
         return trackDataPromise
       })
       let allTracksDataPromises =
@@ -128,7 +127,7 @@ class App extends Component {
           .map(item => item.track)
           .map(trackData => ({
             name: trackData.name,
-            duration: trackData.duration_ms / 1000
+            duration: trackData.duration_ms
           }))
         })
         console.log("after op playlists: ", playlists)
@@ -152,10 +151,17 @@ class App extends Component {
     let playlistToRender =
      this.state.user &&
      this.state.playlists
-      ? this.state.playlists.filter(playlist =>
-        playlist.name.toLowerCase().includes(
-          this.state.filterString.toLowerCase())
-      ) : []
+      ? this.state.playlists.filter(playlist => {
+          let matchesPlaylist = playlist.name.toLowerCase().includes(
+            this.state.filterString.toLowerCase())
+            console.log('matchesPlaylist: ', matchesPlaylist)
+          let matchesSong = playlist.songs.find(song => song.name.toLowerCase()
+            .includes(this.state.filterString.toLowerCase()))
+            console.log('matchesSong: ', matchesSong);
+            return matchesPlaylist || matchesSong
+
+      }) : []
+
 
     return (
       <div className="App">
