@@ -19,20 +19,6 @@ let fakeServerData = {
           {name: 'Hello', duration: 12.96}
         ]
       },
-      {
-        name: 'The right Stuff',
-        songs: [
-          {name:'Beat it1', duration: 1234},
-          {name: 'Hello1', duration: 1234}
-        ]
-      },
-      {
-        name: 'the good stuff',
-        songs: [
-          {name:'Beat it2', duration: 1.234},
-          {name: 'Hello2', duration: 1234}
-        ]
-      }
     ]
   }
 };
@@ -119,14 +105,45 @@ class App extends Component {
     fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {'Authorization': 'Bearer ' + accessToken}
     }).then(response => response.json())
-    .then(data => this.setState({
-      playlists: data.items.map(items => {
-        console.log('YOUR DATA: ', data.items)
+    .then(playlistData => {
+      console.log("playlistData: ", playlistData)
+      let playlists = playlistData.items
+      console.log("playlists: ", playlists)
+      let trackDataPromises = playlists.map(playlist => {
+        let responsePromise = fetch(playlist.tracks.href, {
+          headers: {'Authorization': 'Bearer ' + accessToken}
+        })
+        console.log('responsePromise: ', responsePromise)
+        let trackDataPromise = responsePromise
+          .then(response => response.json())
+        console.log('trackDataPromise: ', trackDataPromise)
+        return trackDataPromise
+      })
+      let allTracksDataPromises =
+        Promise.all(trackDataPromises)
+      let playlistsPromise = allTracksDataPromises.then(trackDatas => {
+        console.log("trackDatas: ", trackDatas);
+        trackDatas.forEach((trackData, i) => {
+          playlists[i].trackDatas = trackData.items
+          .map(item => item.track)
+          .map(trackData => ({
+            name: trackData.name,
+            duration: trackData.duration_ms / 1000
+          }))
+        })
+        console.log("after op playlists: ", playlists)
+        return playlists
+      })
+      console.log('playlistsPromise:', playlistsPromise);
+      return playlistsPromise
+    })
+    .then(playlists => this.setState({
+      playlists: playlists.map(item => {
+        console.log('YOUR DATA: ', item.trackDatas)
         return {
-          name: items.name,
-          imageUrl: items.images[0].url,
-          songs: []
-        }
+          name: item.name,
+          imageUrl: item.images[0].url,
+          songs: item.trackDatas.slice(0,3)        }
       })
     }))
 
