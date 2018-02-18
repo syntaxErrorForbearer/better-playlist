@@ -18,13 +18,14 @@ let defaultStyle = {
 let counterStyle = {...defaultStyle,
   width: "40%",
   display: 'inline-block',
-  marginBottom: '10px',
-  fontSize: '14px',
+  marginBottom: '20px',
+  fontSize: '20px',
   lineHeight: '30px',
 }
 
-// let dropdownPlaceholder = document.getElementsByClassName('Dropdown-placeholder')
-// dropdownPlaceholder.style({backgroundColor: 'blue'})
+function isEven(num) {
+  return num % 2
+}
 
 class PlaylistCounter extends Component{
   render(){
@@ -42,52 +43,40 @@ class HoursCounter extends Component{
 
     let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
       return songs.concat(eachPlaylist.songs)
-    },[])
-    let totalDuration = allSongs.reduce((accumulator, currentSong ) => {
+    },[]),
+    totalDuration = allSongs.reduce((accumulator, currentSong ) => {
       return accumulator + currentSong.duration
-    }, 0)
+    }, 0),
+    selectedTime = !this.props.option? 'Hours' : this.props.option
 
-    console.log('myOption: ', this.props.option);
-    let selectedTime = !this.props.option? 'Hours' : this.props.option
+    function parsedDuration(totalDuration, selectedTime){
 
-      console.log('selectedTime: ', selectedTime);
-
-    let parsedDuration = (totalDuration, selectedTime) => {
-
-      console.log('inside pd totalDuration: ', totalDuration);
-      console.log('inside pd selectedTime: ', selectedTime);
-
-      let totalDurationMSec = Math.round(totalDuration)
-      let totalDurationSec = totalDurationMSec / 1000
-      let totalDurationMin = totalDurationSec / 60
-      let totalDurationHour = totalDurationMin / 60
+      let totalDurationMSec = totalDuration,
+       totalDurationSec = totalDurationMSec / 1000,
+       totalDurationMin = totalDurationSec / 60,
+       totalDurationHour = totalDurationMin / 60
 
       let returnedDuration = selectedTime === 'Seconds' ? totalDurationSec
          : selectedTime === 'Minutes' ? totalDurationMin
          : selectedTime === 'Hours' ? totalDurationHour
          :                   totalDurationMSec
 
-         console.log('inside returnedDuration: ', returnedDuration);
-         return returnedDuration
-
+      return ((number, precision) => {
+         var factor = Math.pow(10, precision);
+         return Math.round(number * factor) / factor;
+      })(returnedDuration, 2)
     }
-
-    console.log('pd: ', parsedDuration(totalDuration, selectedTime));
-    let isTooLow = totalDuration < 1080000
-    let hoursCounterStyle = {...counterStyle,
-        color: isTooLow ? 'red' : 'green',
+    let totalTime = parsedDuration(totalDuration, selectedTime),
+    isTooLow = parsedDuration(totalDuration, 'Hours') < .5,
+    hoursCounterStyle = {...counterStyle,
+        color: isTooLow ? 'rgb(187, 19, 169)' : 'rgb(213, 249, 222)',
         fontWeight: isTooLow ? 'bold' : 'normal',
     }
 
     return(
       <div>
         <div style={hoursCounterStyle}>
-        <h1>{parsedDuration(totalDuration, selectedTime)}</h1>
-         {/*<h2>{Math.round(totalDuration)} hours</h2>
-          <h2>
-            {parseFloat(totalDuration / (1000 * 60 * 60))
-                .toFixed(2)} hours
-          </h2>*/}
+        <h1>{totalTime}</h1>
         </div>
       </div>
     );
@@ -99,7 +88,13 @@ class Filter extends Component{
     return(
       <div style={{defaultStyle}}>
         <img/>
-        <input type="text" onKeyUp={(e) => this.props.onTextChange(e.target.value) }/>
+        <input type="text" onKeyUp={(e) =>
+           this.props.onTextChange(e.target.value) }
+           style={{...defaultStyle,
+             color: 'black',
+             padding: '10px',
+             fontSize: '20px'}}
+        />
       </div>
     )
   }
@@ -109,14 +104,26 @@ class Playlist extends Component{
   render(){
     let playlist = this.props.playlist
     return(
-      <div style={{...defaultStyle, display: 'inline-block', width: '25%'}}>
-        <img src={playlist.imageUrl} style={{width: '70%', marginTop: '10%'}} />
-        <h3>{playlist.name}</h3>
-        <ul>
-          {this.props.playlist.songs.map(song =>
-            <li key={song.name}>{song.name}</li>
-          )}
-        </ul>
+      <div style={{display: 'inline-flex',
+       'justify-content': 'space-between',
+        border: '2px solid red',
+        'overflow': 'auto'
+      }}>
+        <div style={{...defaultStyle,
+          height: '175px',
+          width: '175px',
+          padding: '10px',
+          backgroundColor: isEven(this.props.index) ?
+           '#b6c6a0' : '#d5bdeb'
+        }}>
+          <h2 style={{marginBottom: '7px', fontWeight: 'bold'}}>{playlist.name}</h2>
+          <img src={playlist.imageUrl} style={{width: '70px'}} />
+          <ul style={{marginTop: '10px'}}>
+            {playlist.songs.map(song =>
+              <li style={{paddingTop: '2px'}}>{song.name}</li>
+            )}
+          </ul>
+        </div>
       </div>
     )
   }
@@ -174,16 +181,14 @@ class App extends Component {
         })
         return playlists
       })
-      // console.log('playlistsPromise:', playlistsPromise);
       return playlistsPromise
     })
     .then(playlists => this.setState({
       playlists: playlists.map(item => {
-        // console.log('YOUR DATA: ', item.trackDatas)
         return {
           name: item.name,
           imageUrl: item.images[0].url,
-          songs: item.trackDatas.slice(0,5)
+          songs: item.trackDatas.slice(0,3)
         }
       })
     }))
@@ -197,12 +202,9 @@ class App extends Component {
       ? this.state.playlists.filter(playlist => {
           let matchesPlaylist = playlist.name.toLowerCase().includes(
             this.state.filterString.toLowerCase())
-            // console.log('matchesPlaylist: ', matchesPlaylist)
           let matchesSong = playlist.songs.find(song => song.name.toLowerCase()
             .includes(this.state.filterString.toLowerCase()))
-            // console.log('matchesSong: ', matchesSong);
             return matchesPlaylist || matchesSong
-
       }) : []
 
       let reduceOptions =
@@ -212,7 +214,10 @@ class App extends Component {
       <div className="App">
         {this.state.user ?
           <div>
-            <h1 style={{...defaultStyle, 'fontSize': '54px'}}>
+            <h1 style={{...defaultStyle,
+             fontSize: '54px',
+             marginTop: '5px',
+            }}>
               {this.state.user.name}'s Playlist
             </h1>
               <PlaylistCounter playlists={playlistToRender} />
@@ -223,22 +228,22 @@ class App extends Component {
                   value={this.state.selected.label} placeholder="Select an option"
                 />
               </div>
-              <Filter style={{margin: '5px'}} onTextChange={text => {
-                this.setState({filterString: text})
+              <Filter
+                onTextChange={text => {
+                  this.setState({filterString: text})
               }}/>
-              {playlistToRender.map(playlist =>
-                <Playlist playlist={playlist} />
+              {playlistToRender.map((playlist, i) =>
+                <Playlist playlist={playlist} index={i} />
               )}
-
-          </div> : <button onClick={() => {
+          </div>
+        : <button onClick={() => {
             window.location = window.location.href.includes('localhost')
               ? 'http://localhost:8888/login'
               : 'https://better-playlists-backend-4-you.herokuapp.com/login' }
-              // : 'https://better-playlists-backend-4-you.herokuapp.com/login' }
             }
-            style={{padding: '20px', 'fontSize': '50px', 'marginTop': '20px'}}>Sign in to Spotify</button>
-        // {/*</div> : <button onClick={() => window.location = 'http://localhost:8888/login'}*/}
-          //{{/*<h1 style={defaultStyle}>'Loading...'</h1>*/}}
+            style={{padding: '20px', 'fontSize': '50px', 'marginTop': '20px'}}>
+              Sign in to Spotify
+          </button>
         }
       </div>
     );
