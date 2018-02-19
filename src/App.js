@@ -17,7 +17,7 @@ let defaultStyle = {
 }
 let counterStyle = {...defaultStyle,
   width: "40%",
-  display: 'inline-block',
+  display: 'inline',
   marginBottom: '20px',
   fontSize: '20px',
   lineHeight: '30px',
@@ -75,7 +75,7 @@ class HoursCounter extends Component{
 
     return(
       <div>
-        <div style={hoursCounterStyle}>
+        <div style={{...hoursCounterStyle}}>
         <h1>{totalTime}</h1>
         </div>
       </div>
@@ -106,7 +106,7 @@ class Playlist extends Component{
     return(
       <div style={{display: 'inline-flex',
        'justify-content': 'space-between',
-        border: '2px solid red',
+        border: '2px solid white',
         'overflow': 'auto'
       }}>
         <div style={{...defaultStyle,
@@ -220,21 +220,20 @@ class App extends Component {
             }}>
               {this.state.user.name}'s Playlist
             </h1>
-              <PlaylistCounter playlists={playlistToRender} />
+            <PlaylistCounter playlists={playlistToRender} />
+            <div className="dropdown-div">
               <HoursCounter  playlists={playlistToRender} option={this.state.selected.label}/>
-              <div className="dropdown-div">
-                <Dropdown className="dropdown-class" options={reduceOptions()}
-                  onChange={e => this.setState({selected: {label: e.label}})}
-                  value={this.state.selected.label} placeholder="Select an option"
-                />
-              </div>
-              <Filter
-                onTextChange={text => {
-                  this.setState({filterString: text})
-              }}/>
-              {playlistToRender.map((playlist, i) =>
-                <Playlist playlist={playlist} index={i} />
-              )}
+              <Dropdown className="dropdown-class" options={reduceOptions()}
+                onChange={e => this.setState({selected: {label: e.label}})}
+                value={this.state.selected.label} placeholder="Select an option"
+              />
+            </div>
+            <Filter onTextChange={text => {
+              this.setState({filterString: text})
+            }}/>
+            {playlistToRender.map((playlist, i) =>
+              <Playlist playlist={playlist} index={i} />
+            )}
           </div>
         : <button onClick={() => {
             window.location = window.location.href.includes('localhost')

@@ -7,7 +7,7 @@ body {
 }
 
 .dropdown-div {
-  display: flex;
+  display: inline-flex;
 }
 
 .dropdown-class {
